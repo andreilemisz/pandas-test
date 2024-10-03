@@ -1,11 +1,25 @@
 import pandas as pd
+import requests
+import json
+import csv
 
 ###########################
 # Precisa adicionar a extração do relatório pela API e verificar qual o nome dos cabeçalhos para substituir nas configurações abaixo
 ###########################
 
 """ Variáveis globais. Alterar para funcionar com o relatório emitido pela API """
+# Primeiro as variáveis da API
+API_URL = "https://3c.fluxoti.com/api/v1/calls/"
+API_Token = "Wg4MWjTAHx0Cy6dZ0Q7rbI6q3i9TTRVtQ84QQGJmfy06A6GUYeLQJSFn802L"
+API_ID_Campanha = 142763
+API_Dados = {
+    "campaigns": [API_ID_Campanha],
+    }
+API_Headers = {
+    "Authorization": f'Bearer {API_Token}'
+}
 
+# Depois variáveis sobre a filtragem dos dados
 caminho_arquivo = r'C:\Users\conta\Desktop\pasta_padrao_VS_Code\Codigo_Filtro_Discador\Relatorio_Final_Regime.Geral_PR_2025.csv' # Caso o relatório esteja em .csv e não puxado direto da API
 cabecalho_data = "DATA_LIGACAO"
 cabecalho_qualificacao = "QUALIFICACAO"
@@ -17,6 +31,12 @@ nome_negativo = "número_ruim"
 arquivo_relatorio_ultima_ligacao = "planilha_ultima_ligacao.csv"
 arquivo_relatorio_numberos_bons = "planilha_numeros_bons.csv"
 arquivo_relatorio_numberos_ruins = "planilha_numberos_ruins.csv"
+
+def extracao_dados_api(API_ID_Campanha):
+    """ Apenas ativar essa função se precisar extrair o .csv direto da API da discadora """
+    resultado_extracao = requests.get(API_URL, headers=API_Headers, data=json.dumps(API_Dados))
+    df_extracao = pd.DataFrame(resultado_extracao)
+    df_extracao.to_csv(caminho_arquivo, index=False)
 
 def execucao_filtragem_relatorio(caminho_arquivo):
     """ Passo a Passo das Funções que Serão Executadas """
@@ -58,4 +78,5 @@ def relatorio_numeros_ruins(df):
 ###########################
 """ Execução do Programa """
 if __name__ == "__main__":
+    extracao_dados_api(API_ID_Campanha)
     execucao_filtragem_relatorio(caminho_arquivo)
