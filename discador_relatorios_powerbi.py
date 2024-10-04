@@ -13,16 +13,15 @@ import csv
 
 # Primeiro as variáveis da API
 API_URL = "https://3c.fluxoti.com/api/v1/calls/"
-API_Token = ""
-API_ID_Campanha = 1
+API_Token = "Wg4MWjTAHx0Cy6dZ0Q7rbI6q3i9TTRVtQ84QQGJmfy06A6GUYeLQJSFn802L"
+API_ID_Campanha = 142763
 API_Dados = {
-    "campaigns": [API_ID_Campanha],
+    "campaigns": list({API_ID_Campanha}),
     "per_page": 2
     }
 API_Headers = {
     "Authorization": f'Bearer {API_Token}'
 }
-API_Chaves_Relevantes = ["number", "campaign_id", "qualification", "readable_status_text", "mode"]
 
 # Caminho onde está o JSON pronto, se for o caso. Não é necessário preencher se for fazer a request da API automaticamente
 caminho_json = 'consulta_API_ligacoes.json' 
@@ -51,7 +50,7 @@ def extracao_dados_api(): # Com problema, ainda não está trazendo apenas a cam
     """ Apenas ativar essa função se precisar extrair o JSON direto da API da discadora """
     
     # Comando GET para pegar os dados da API
-    resultado_extracao = requests.get(API_URL, headers=API_Headers, data=json.dumps(API_Dados))
+    resultado_extracao = requests.get(API_URL, headers=API_Headers, json=API_Dados)
     dados_em_json = resultado_extracao.json()
 
     # Criando o arquivo JSON com o que foi extraído da request
