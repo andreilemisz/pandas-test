@@ -4,12 +4,14 @@ import json
 import csv
 
 ###########################
-# Precisa adicionar a extração do relatório pela API e verificar qual o nome dos cabeçalhos para substituir nas configurações abaixo
+# Atenção: 
+# Sempre verificar qual o nome dos cabeçalhos para substituir nas configurações abaixo
+# Também pode desativar a opção de extrair as informações da API na execução no final
 ###########################
 
 """ Variáveis globais. Alterar para funcionar com o relatório emitido pela API """
 # Primeiro as variáveis da API
-API_URL = "https://3c.fluxoti.com/api/v1/calls/"
+API_URL = "https://3c.fluxoti.com/api/v1/calls/?fields=number,call_date"
 API_Token = "Wg4MWjTAHx0Cy6dZ0Q7rbI6q3i9TTRVtQ84QQGJmfy06A6GUYeLQJSFn802L"
 API_ID_Campanha = 142763
 API_Dados = {
@@ -18,12 +20,16 @@ API_Dados = {
 API_Headers = {
     "Authorization": f'Bearer {API_Token}'
 }
+API_Parametros = {
+    "fields": "id, name"
+}
+API_Chaves_Relevantes = ["number", "campaign_id", "qualification", "readable_status_text", "mode"]
 
 # Depois variáveis sobre a filtragem dos dados
 caminho_arquivo = r'C:\Users\conta\Desktop\pasta_padrao_VS_Code\Codigo_Filtro_Discador\Relatorio_Final_Regime.Geral_PR_2025.csv' # Caso o relatório esteja em .csv e não puxado direto da API
-cabecalho_data = "DATA_LIGACAO"
-cabecalho_qualificacao = "QUALIFICACAO"
-cabecalho_telefone = "NUMERO_TELEFONE"
+cabecalho_data = "call_date"
+cabecalho_qualificacao = "qualification"
+cabecalho_telefone = "number"
 nomes_para_substituir_positivos = ['Retornar depois (contato correto)', 'Não aceitou proposta e sabe da antecipação', 'Não aceitou proposta e NÃO sabe da antecipação', 'Aceitou proposta e sabe da antecipação', 'Aceitou proposta e NÃO sabe da antecipação ', 'Já vendeu', 'Falecido']
 nomes_para_substituir_negativos = ['Número errado', 'Não qualificada', 'Mudo', 'Discar novamente', 'Contato de parente e NÃO conseguiu o contato certo', 'Contato de parente e conseguiu o contato certo', 'Caixa Postal', 'Sem qualificação', '-']
 nome_positivo = "número_bom"
@@ -34,9 +40,19 @@ arquivo_relatorio_numberos_ruins = "planilha_numberos_ruins.csv"
 
 def extracao_dados_api(API_ID_Campanha):
     """ Apenas ativar essa função se precisar extrair o .csv direto da API da discadora """
+    # Comando GET para pegar os dados da API
+    # resultado_extracao = requests.get(API_URL, headers=API_Headers, data=json.dumps(API_Dados), params=API_Parametros)
     resultado_extracao = requests.get(API_URL, headers=API_Headers, data=json.dumps(API_Dados))
-    df_extracao = pd.DataFrame(resultado_extracao)
-    df_extracao.to_csv(caminho_arquivo, index=False)
+    print(resultado_extracao)
+    dados_em_json = resultado_extracao.json()
+    # Filtrando o JSON para excluir as chaves que a gente não tem interesse em exibir depois
+    # dados_filtrados = [{chave: item[chave] for chave in API_Chaves_Relevantes if chave in item} for item in dados_em_json]
+    # Salvando o arquivo filtrado para conferência
+    with open('dados_filtrados.json', 'w', encoding='utf-8') as f:
+        json.dump(dados_em_json, f, ensure_ascii=False, indent=4)
+    
+    # df_extracao = pd.DataFrame(resultado_extracao)
+    # df_extracao.to_csv(caminho_arquivo, index=False)
 
 def execucao_filtragem_relatorio(caminho_arquivo):
     """ Passo a Passo das Funções que Serão Executadas """
@@ -79,4 +95,4 @@ def relatorio_numeros_ruins(df):
 """ Execução do Programa """
 if __name__ == "__main__":
     extracao_dados_api(API_ID_Campanha)
-    execucao_filtragem_relatorio(caminho_arquivo)
+    # execucao_filtragem_relatorio(caminho_arquivo)
