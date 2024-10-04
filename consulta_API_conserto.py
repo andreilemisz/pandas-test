@@ -12,7 +12,7 @@ import csv
 """ Variáveis globais. Alterar para funcionar com o relatório emitido pela API """
 # Primeiro as variáveis da API
 API_URL = "https://3c.fluxoti.com/api/v1/calls/"
-API_Token = "Wg4MWjTAHx0Cy6dZ0Q7rbI6q3i9TTRVtQ84QQGJmfy06A6GUYeLQJSFn802L"
+API_Token = ""
 API_ID_Campanha = 142763
 API_Dados = {
     "campaigns": [API_ID_Campanha],
