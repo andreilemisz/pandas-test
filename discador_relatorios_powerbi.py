@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import requests
 import json
@@ -13,11 +14,11 @@ import csv
 
 # Primeiro as variáveis da API
 API_URL = "https://3c.fluxoti.com/api/v1/calls/"
-API_Token = ""
-API_ID_Campanha = 
+API_Token = "Wg4MWjTAHx0Cy6dZ0Q7rbI6q3i9TTRVtQ84QQGJmfy06A6GUYeLQJSFn802L"
+API_ID_Campanha = 142763
 API_Dados = {
     "campaigns": list({API_ID_Campanha}),
-    "per_page": 2
+    "per_page": 5
     }
 API_Headers = {
     "Authorization": f'Bearer {API_Token}'
@@ -67,7 +68,7 @@ def arquivo_json_para_csv(dados_em_json):
     
     # A categoria 'data' é uma lista dentro do retorno em JSON e é onde estão os valores que a gente precisa, por isso precisa fazer essa busca primeiro
     dados_na_categoria_correta = dados_em_json.get('data', [])
-    with open(caminho_csv, 'w', newline="") as arquivocsv:
+    with open(caminho_csv, 'w', newline="", encoding="utf-8") as arquivocsv:
         cabecalhos = valores_a_buscar
         funcao_escritor = csv.DictWriter(arquivocsv, fieldnames=cabecalhos)
         funcao_escritor.writeheader()
@@ -82,10 +83,10 @@ def arquivo_json_para_csv(dados_em_json):
             phone_type_value = linha.get('phone_type', None)
             mode_value = linha.get('mode', None)
 
-        """ Mesma coisa aqui, para cada coluna a ser adicionada tem que adicionar a sintaxe abaixo nos dois lugares """
-        if number_value is not None and call_date_value is not None and campaign_id_value is not None and qualification_value is not None and readable_status_text_value is not None and phone_type_value is not None and mode_value is not None:
+            """ Mesma coisa aqui, para cada coluna a ser adicionada tem que adicionar a sintaxe abaixo nos dois lugares """
+            if number_value is not None and call_date_value is not None and campaign_id_value is not None and qualification_value is not None and readable_status_text_value is not None and phone_type_value is not None and mode_value is not None:
 
-            funcao_escritor.writerow({'number': number_value, 'call_date': call_date_value, 'campaign_id': campaign_id_value, 'qualification': qualification_value, 'readable_status_text': readable_status_text_value, 'phone_type': phone_type_value, 'mode': mode_value})
+                funcao_escritor.writerow({'number': number_value, 'call_date': call_date_value, 'campaign_id': campaign_id_value, 'qualification': qualification_value, 'readable_status_text': readable_status_text_value, 'phone_type': phone_type_value, 'mode': mode_value})
 
     # O fim dessa função é a criação de uma planilha CSV criada com cabeçalhos e os valores que a gente decidiu filtrar
 
@@ -138,11 +139,12 @@ def relatorio_numeros_ruins(df):
 if __name__ == "__main__":
 
         # O resultado dessa primeira função é que a variavel "dados_em_json" contem a JSON da consulta feita
-    extracao_dados_api()
+    if not os.path.exists(caminho_json):
+        extracao_dados_api()
 
         # Para o próximo passo, é preciso que a variável 'dados_em_json' esteja com um arquivo JSON já lido. Isso já está certo se extracao_dados_api() for usado antes. Se não for o caso, ele ativa a leitura do JSON que está na variável "caminho_json" que é configurada no cabeçalho do programa
     if dados_em_json == None:
-        with open(caminho_json, 'r') as json_aberto:
+        with open(caminho_json, 'r', encoding="utf-8") as json_aberto:
             dados_em_json = json.load(json_aberto)
 
         # Terceiro passo é transformar o arquivo JSON que está em "dados_em_json" para uma tabela CSV
